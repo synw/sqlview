@@ -28,10 +28,12 @@ class _MyCrudPageState extends State<MyCrudPage> {
           bloc: bloc,
           updateItemAction: update, 
           deleteItemAction: delete,
-          trailing: Icon(
-            Icons.location_off,
-            color: Colors.grey,
-          ),
+          trailing: (_context, _item) {
+			return IconButton(
+            	icon: Icons.location_off,
+            	onPressed: () => print("$_item"),
+		  	}
+		  ),
         ),
         Positioned(
             right: 15.0,

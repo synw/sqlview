@@ -8,7 +8,7 @@ class _CrudViewState extends State<CrudView> {
       {@required this.bloc,
       @required this.updateItemAction,
       @required this.deleteItemAction,
-      this.trailing,
+      this.trailingBuilder,
       this.nameField: "name"})
       : assert(bloc != null),
         assert(updateItemAction != null),
@@ -19,7 +19,7 @@ class _CrudViewState extends State<CrudView> {
   final Function deleteItemAction;
   final Function updateItemAction;
   final String nameField;
-  final Widget trailing;
+  Function trailingBuilder;
   bool _isInitialized = false;
   SlidableController _slidableController;
 
@@ -55,7 +55,10 @@ class _CrudViewState extends State<CrudView> {
                           Text(item[nameField] ?? "NULL TEXT $item $nameField"),
                       onTap: () => updateItemAction(context, item),
                     ),
-                    trailing: trailing,
+                    trailing: BuildedItem(
+                      builder: trailingBuilder,
+                      item: item,
+                    ),
                   ),
                   actions: <Widget>[
                     IconSlideAction(
@@ -87,14 +90,14 @@ class CrudView extends StatefulWidget {
     @required this.updateItemAction,
     @required this.deleteItemAction,
     this.nameField: "name",
-    this.trailing,
+    this.trailingBuilder,
   });
 
   final SelectBloc bloc;
   final Function deleteItemAction;
   final Function updateItemAction;
   final String nameField;
-  final Widget trailing;
+  final Function trailingBuilder;
 
   @override
   _CrudViewState createState() => _CrudViewState(
@@ -102,5 +105,19 @@ class CrudView extends StatefulWidget {
       updateItemAction: updateItemAction,
       deleteItemAction: deleteItemAction,
       nameField: nameField,
-      trailing: trailing);
+      trailingBuilder: trailingBuilder);
+}
+
+class BuildedItem extends StatelessWidget {
+  BuildedItem({@required this.builder, @required this.item})
+      : assert(builder != null),
+        assert(item != null);
+
+  final Function builder;
+  final Map<String, dynamic> item;
+
+  @override
+  Widget build(BuildContext context) {
+    return builder(context, item);
+  }
 }
