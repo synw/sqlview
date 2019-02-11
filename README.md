@@ -29,11 +29,11 @@ class _MyCrudPageState extends State<MyCrudPage> {
           updateItemAction: update, 
           deleteItemAction: delete,
           trailing: (_context, _item) {
-			return IconButton(
-            	icon: Icons.location_off,
-            	onPressed: () => print("$_item"),
-		  	}
-		  ),
+            return IconButton(
+                icon: Icons.location_off,
+                onPressed: () => print("$_item"),
+              }
+          ),
         ),
         Positioned(
             right: 15.0,
@@ -49,45 +49,45 @@ class _MyCrudPageState extends State<MyCrudPage> {
 }
 
 add(BuildContext context) {
-	showDialog(
-		context: context,
-		builder: (BuildContext context) {
-		return AlertDialog(
-			// ...
-			// Save using the Sqlcool database
-			// Map<String, String> row = {"name": "value"};
-			// db.add(table: "mytable", row: row);
-			);
-		}
-	);
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+        return AlertDialog(
+            // ...
+            // Save using the Sqlcool database
+            // Map<String, String> row = {"name": "value"};
+            // db.add(table: "mytable", row: row);
+            );
+        }
+    );
 }
 
 update(BuildContext context, Map<String, dynamic> item) {
-	// item is the json record
-	showDialog(
-		context: context,
-		builder: (BuildContext context) {
-		return AlertDialog(
-			// ...
-			// Update using the Sqlcool database
-			// Map<String, String> row = {"name": "value"};
-			// db.update(table: "mytable", row: row, where: 'id=${item["id"]}');
-			);
-	);
+    // item is the json record
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+        return AlertDialog(
+            // ...
+            // Update using the Sqlcool database
+            // Map<String, String> row = {"name": "value"};
+            // db.update(table: "mytable", row: row, where: 'id=${item["id"]}');
+            );
+    );
 }
 
 delete(BuildContext context, Map<String, dynamic> item) {
-	// item is the json record
-	showDialog(
-		context: context,
-		builder: (BuildContext context) {
-		return AlertDialog(
-			// ...
-			// delete using the Sqlcool database
-			// db.delete(table: "mytable", where: 'id=${item["id"]}');
-			);
-		}
-	);
+    // item is the json record
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+        return AlertDialog(
+            // ...
+            // delete using the Sqlcool database
+            // db.delete(table: "mytable", where: 'id=${item["id"]}');
+            );
+        }
+    );
 }
 
 class MyCrudPage extends StatefulWidget {
