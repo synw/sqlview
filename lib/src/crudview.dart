@@ -31,7 +31,6 @@ class _CrudViewState extends State<CrudView> {
         (_c, _i) {
           return Container();
         };
-    onTap = onTap ?? (_c, _i) {};
     super.setState(fn);
   }
 
