@@ -1,3 +1,3 @@
 library sqlview;
 
-export "src/sqlview.dart";
+export "src/crudview.dart";
