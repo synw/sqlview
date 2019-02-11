@@ -24,6 +24,15 @@ class _CrudViewState extends State<CrudView> {
   SlidableController _slidableController;
 
   @override
+  void setState(fn) {
+    trailingBuilder = trailingBuilder ??
+        (_c, _i) {
+          return Container();
+        };
+    super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map>>(
       stream: this.bloc.items,
