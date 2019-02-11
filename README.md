@@ -26,8 +26,8 @@ class _MyCrudPageState extends State<MyCrudPage> {
     children: <Widget>[
         CrudView(
           bloc: bloc,
-          updateItemAction: update, 
-          deleteItemAction: delete,
+          onUpdate: update, 
+          onDelete: delete,
           trailing: (_context, _item) {
             return IconButton(
                 icon: Icons.location_off,

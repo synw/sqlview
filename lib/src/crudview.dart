@@ -6,19 +6,21 @@ import 'package:sqlcool/sqlcool.dart';
 class _CrudViewState extends State<CrudView> {
   _CrudViewState(
       {@required this.bloc,
-      @required this.updateItemAction,
-      @required this.deleteItemAction,
+      @required this.onUpdate,
+      @required this.onDelete,
       this.trailingBuilder,
+      this.onTap,
       this.nameField: "name"})
       : assert(bloc != null),
-        assert(updateItemAction != null),
-        assert(deleteItemAction != null),
+        assert(onUpdate != null),
+        assert(onDelete != null),
         assert(nameField != null);
 
   final SelectBloc bloc;
-  final Function deleteItemAction;
-  final Function updateItemAction;
+  final Function onDelete;
+  final Function onUpdate;
   final String nameField;
+  Function onTap;
   Function trailingBuilder;
   bool _isInitialized = false;
   SlidableController _slidableController;
@@ -29,6 +31,7 @@ class _CrudViewState extends State<CrudView> {
         (_c, _i) {
           return Container();
         };
+    onTap = onTap ?? (_c, _i) {};
     super.setState(fn);
   }
 
@@ -59,11 +62,12 @@ class _CrudViewState extends State<CrudView> {
                   delegate: SlidableBehindDelegate(),
                   actionExtentRatio: 0.25,
                   child: ListTile(
-                    title: GestureDetector(
-                      child:
-                          Text(item[nameField] ?? "NULL TEXT $item $nameField"),
-                      onTap: () => updateItemAction(context, item),
-                    ),
+                    title: (onTap != null)
+                        ? GestureDetector(
+                            child: Text(item[nameField]),
+                            onTap: () => onTap(context, item),
+                          )
+                        : Text(item[nameField]),
                     trailing: BuildedItem(
                       builder: trailingBuilder,
                       item: item,
@@ -74,7 +78,13 @@ class _CrudViewState extends State<CrudView> {
                       caption: 'Delete',
                       color: Colors.red,
                       icon: Icons.delete,
-                      onTap: () => deleteItemAction(context, item),
+                      onTap: () => onDelete(context, item),
+                    ),
+                    IconSlideAction(
+                      caption: 'Edit',
+                      color: Colors.blue,
+                      icon: Icons.edit,
+                      onTap: () => onUpdate(context, item),
                     ),
                   ],
                 );
@@ -96,25 +106,28 @@ class _CrudViewState extends State<CrudView> {
 class CrudView extends StatefulWidget {
   CrudView({
     @required this.bloc,
-    @required this.updateItemAction,
-    @required this.deleteItemAction,
+    @required this.onUpdate,
+    @required this.onDelete,
     this.nameField: "name",
     this.trailingBuilder,
+    this.onTap,
   });
 
   final SelectBloc bloc;
-  final Function deleteItemAction;
-  final Function updateItemAction;
+  final Function onDelete;
+  final Function onUpdate;
   final String nameField;
   final Function trailingBuilder;
+  final Function onTap;
 
   @override
   _CrudViewState createState() => _CrudViewState(
       bloc: bloc,
-      updateItemAction: updateItemAction,
-      deleteItemAction: deleteItemAction,
+      onUpdate: onUpdate,
+      onDelete: onDelete,
       nameField: nameField,
-      trailingBuilder: trailingBuilder);
+      trailingBuilder: trailingBuilder,
+      onTap: onTap);
 }
 
 class BuildedItem extends StatelessWidget {
