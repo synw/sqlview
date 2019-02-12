@@ -7,19 +7,25 @@ class _CrudViewState extends State<CrudView> {
   _CrudViewState(
       {@required this.bloc,
       @required this.onUpdate,
-      @required this.onDelete,
+      this.onDelete,
       this.trailingBuilder,
       this.onTap,
       this.nameField: "name"})
       : assert(bloc != null),
         assert(onUpdate != null),
-        assert(onDelete != null),
-        assert(nameField != null);
+        assert(nameField != null) {
+    trailingBuilder = trailingBuilder ??
+        (_c, _i) {
+          return Text("");
+        };
+    onDelete = onDelete ?? _onDelete;
+    onTap = onTap ?? () => {};
+  }
 
   final SelectBloc bloc;
-  final Function onDelete;
   final Function onUpdate;
   final String nameField;
+  Function onDelete;
   Function onTap;
   Function trailingBuilder;
   bool _isInitialized = false;
@@ -27,17 +33,13 @@ class _CrudViewState extends State<CrudView> {
 
   @override
   void setState(fn) {
-    trailingBuilder = trailingBuilder ??
-        (_c, _i) {
-          return Container();
-        };
     super.setState(fn);
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<Map>>(
-      stream: this.bloc.items,
+      stream: bloc.items,
       builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot) {
         if (snapshot.hasData) {
           _isInitialized = true;
@@ -54,7 +56,6 @@ class _CrudViewState extends State<CrudView> {
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
                 var item = snapshot.data[index];
-                print("ITEM ${item["name"]} ${item[nameField]}");
                 return Slidable(
                   controller: _slidableController,
                   direction: Axis.horizontal,
@@ -100,13 +101,49 @@ class _CrudViewState extends State<CrudView> {
       },
     );
   }
+
+  _onDelete(_context, _item) {
+    /// Default onDelete action
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete ${_item[nameField]}?"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            RaisedButton(
+              child: Text("Delete"),
+              color: Colors.red,
+              textColor: Colors.white,
+              onPressed: () {
+                bloc.database
+                    .delete(
+                        table: bloc.table,
+                        where: 'id=${_item["id"]}',
+                        verbose: bloc.verbose)
+                    .catchError((e) {
+                  throw (e);
+                });
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class CrudView extends StatefulWidget {
   CrudView({
     @required this.bloc,
     @required this.onUpdate,
-    @required this.onDelete,
+    this.onDelete,
     this.nameField: "name",
     this.trailingBuilder,
     this.onTap,
