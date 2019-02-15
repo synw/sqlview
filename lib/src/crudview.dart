@@ -12,8 +12,7 @@ class _CrudViewState extends State<CrudView> {
       this.onTap,
       this.nameField: "name"})
       : assert(bloc != null),
-        assert(onUpdate != null),
-        assert(nameField != null) {
+        assert(onUpdate != null) {
     trailingBuilder = trailingBuilder ??
         (_c, _i) {
           return Text("");
@@ -64,10 +63,10 @@ class _CrudViewState extends State<CrudView> {
                   child: ListTile(
                     title: (onTap != null)
                         ? GestureDetector(
-                            child: Text(item[nameField]),
+                            child: Text("${item[nameField]}"),
                             onTap: () => onTap(context, item),
                           )
-                        : Text(item[nameField]),
+                        : Text("${item[nameField]}"),
                     trailing: BuildedItem(
                       builder: trailingBuilder,
                       item: item,
@@ -121,14 +120,14 @@ class _CrudViewState extends State<CrudView> {
               color: Colors.red,
               textColor: Colors.white,
               onPressed: () {
-                bloc.database
+                /*bloc.database
                     .delete(
                         table: bloc.table,
                         where: 'id=${_item["id"]}',
                         verbose: bloc.verbose)
                     .catchError((e) {
                   throw (e);
-                });
+                });*/
                 Navigator.of(context).pop(true);
               },
             ),
