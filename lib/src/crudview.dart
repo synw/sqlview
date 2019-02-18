@@ -9,6 +9,8 @@ class _CrudViewState extends State<CrudView> {
       @required this.onUpdate,
       this.onDelete,
       this.trailingBuilder,
+      this.titleBuilder,
+      this.nameBuilder,
       this.onTap,
       this.nameField: "name"})
       : assert(bloc != null),
@@ -18,7 +20,8 @@ class _CrudViewState extends State<CrudView> {
           return Text("");
         };
     onDelete = onDelete ?? _onDelete;
-    onTap = onTap ?? () => {};
+    onTap = onTap ?? (_, __) => {};
+    titleBuilder = titleBuilder ?? _buildTitle;
   }
 
   final SelectBloc bloc;
@@ -27,6 +30,9 @@ class _CrudViewState extends State<CrudView> {
   Function onDelete;
   Function onTap;
   Function trailingBuilder;
+  Function titleBuilder;
+  Function nameBuilder;
+
   bool _isInitialized = false;
   SlidableController _slidableController;
 
@@ -61,12 +67,10 @@ class _CrudViewState extends State<CrudView> {
                   delegate: SlidableBehindDelegate(),
                   actionExtentRatio: 0.25,
                   child: ListTile(
-                    title: (onTap != null)
-                        ? GestureDetector(
-                            child: Text("${item[nameField]}"),
-                            onTap: () => onTap(context, item),
-                          )
-                        : Text("${item[nameField]}"),
+                    title: BuildedItem(
+                      builder: titleBuilder,
+                      item: item,
+                    ),
                     trailing: BuildedItem(
                       builder: trailingBuilder,
                       item: item,
@@ -103,11 +107,15 @@ class _CrudViewState extends State<CrudView> {
 
   _onDelete(_context, _item) {
     /// Default onDelete action
+    String _name;
+    (nameBuilder == null)
+        ? _name = _item[nameField]
+        : _name = nameBuilder(_context, _item);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Delete ${_item[nameField]}?"),
+          title: Text("Delete $_name?"),
           actions: <Widget>[
             FlatButton(
               child: Text("Cancel"),
@@ -120,14 +128,14 @@ class _CrudViewState extends State<CrudView> {
               color: Colors.red,
               textColor: Colors.white,
               onPressed: () {
-                /*bloc.database
+                bloc.database
                     .delete(
                         table: bloc.table,
                         where: 'id=${_item["id"]}',
                         verbose: bloc.verbose)
                     .catchError((e) {
                   throw (e);
-                });*/
+                });
                 Navigator.of(context).pop(true);
               },
             ),
@@ -135,6 +143,17 @@ class _CrudViewState extends State<CrudView> {
         );
       },
     );
+  }
+
+  Widget _buildTitle(BuildContext c, Map<String, dynamic> item) {
+    Widget w;
+    (onTap != null)
+        ? w = GestureDetector(
+            child: Text("${item[nameField]}"),
+            onTap: () => onTap(context, item),
+          )
+        : w = Text("${item[nameField]}");
+    return w;
   }
 }
 
@@ -145,6 +164,8 @@ class CrudView extends StatefulWidget {
     this.onDelete,
     this.nameField: "name",
     this.trailingBuilder,
+    this.titleBuilder,
+    this.nameBuilder,
     this.onTap,
   });
 
@@ -153,6 +174,8 @@ class CrudView extends StatefulWidget {
   final Function onUpdate;
   final String nameField;
   final Function trailingBuilder;
+  final Function titleBuilder;
+  final Function nameBuilder;
   final Function onTap;
 
   @override
@@ -162,6 +185,8 @@ class CrudView extends StatefulWidget {
       onDelete: onDelete,
       nameField: nameField,
       trailingBuilder: trailingBuilder,
+      titleBuilder: titleBuilder,
+      nameBuilder: nameBuilder,
       onTap: onTap);
 }
 
