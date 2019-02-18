@@ -3,35 +3,42 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
 
+typedef void ItemActionBuilder(BuildContext context, Map<String, dynamic> item);
+typedef Widget ItemWidgetBuilder(
+    BuildContext context, Map<String, dynamic> item);
+typedef String ItemStringBuilder(
+    BuildContext context, Map<String, dynamic> item);
+
 class _CrudViewState extends State<CrudView> {
   _CrudViewState(
       {@required this.bloc,
-      @required this.onUpdate,
+      this.onUpdate,
       this.onDelete,
       this.trailingBuilder,
       this.titleBuilder,
       this.nameBuilder,
       this.onTap,
-      this.nameField: "name"})
-      : assert(bloc != null),
-        assert(onUpdate != null) {
+      this.nameField})
+      : assert(bloc != null) {
+    nameField = nameField ?? "name";
     trailingBuilder = trailingBuilder ??
-        (_c, _i) {
+        (_, __) {
           return Text("");
         };
     onDelete = onDelete ?? _onDelete;
     onTap = onTap ?? (_, __) => {};
+    onUpdate = onUpdate ?? (_, __) => {};
     titleBuilder = titleBuilder ?? _buildTitle;
   }
 
   final SelectBloc bloc;
-  final Function onUpdate;
-  final String nameField;
-  Function onDelete;
-  Function onTap;
-  Function trailingBuilder;
-  Function titleBuilder;
-  Function nameBuilder;
+  String nameField;
+  ItemActionBuilder onUpdate;
+  ItemActionBuilder onDelete;
+  ItemActionBuilder onTap;
+  ItemWidgetBuilder trailingBuilder;
+  ItemWidgetBuilder titleBuilder;
+  ItemStringBuilder nameBuilder;
 
   bool _isInitialized = false;
   SlidableController _slidableController;
@@ -105,7 +112,7 @@ class _CrudViewState extends State<CrudView> {
     );
   }
 
-  _onDelete(_context, _item) {
+  void _onDelete(BuildContext _context, Map<String, dynamic> _item) {
     /// Default onDelete action
     String _name;
     (nameBuilder == null)
@@ -160,9 +167,9 @@ class _CrudViewState extends State<CrudView> {
 class CrudView extends StatefulWidget {
   CrudView({
     @required this.bloc,
-    @required this.onUpdate,
+    this.nameField,
+    this.onUpdate,
     this.onDelete,
-    this.nameField: "name",
     this.trailingBuilder,
     this.titleBuilder,
     this.nameBuilder,
@@ -170,20 +177,20 @@ class CrudView extends StatefulWidget {
   });
 
   final SelectBloc bloc;
-  final Function onDelete;
-  final Function onUpdate;
   final String nameField;
-  final Function trailingBuilder;
-  final Function titleBuilder;
-  final Function nameBuilder;
-  final Function onTap;
+  final ItemActionBuilder onDelete;
+  final ItemActionBuilder onUpdate;
+  final ItemActionBuilder onTap;
+  final ItemWidgetBuilder trailingBuilder;
+  final ItemWidgetBuilder titleBuilder;
+  final ItemStringBuilder nameBuilder;
 
   @override
   _CrudViewState createState() => _CrudViewState(
       bloc: bloc,
+      nameField: nameField,
       onUpdate: onUpdate,
       onDelete: onDelete,
-      nameField: nameField,
       trailingBuilder: trailingBuilder,
       titleBuilder: titleBuilder,
       nameBuilder: nameBuilder,
