@@ -17,7 +17,6 @@ class _CrudViewState extends State<CrudView> {
       this.trailingBuilder,
       this.titleBuilder,
       this.nameBuilder,
-      this.onTap,
       this.nameField})
       : assert(bloc != null) {
     nameField = nameField ?? "name";
@@ -26,8 +25,7 @@ class _CrudViewState extends State<CrudView> {
           return Text("");
         };
     onDelete = onDelete ?? _onDelete;
-    onTap = onTap ?? (_, __) => {};
-    onUpdate = onUpdate ?? (_, __) => {};
+    onUpdate = onUpdate ?? (_, __) => null;
     titleBuilder = titleBuilder ?? _buildTitle;
   }
 
@@ -35,7 +33,6 @@ class _CrudViewState extends State<CrudView> {
   String nameField;
   ItemActionBuilder onUpdate;
   ItemActionBuilder onDelete;
-  ItemActionBuilder onTap;
   ItemWidgetBuilder trailingBuilder;
   ItemWidgetBuilder titleBuilder;
   ItemStringBuilder nameBuilder;
@@ -153,34 +150,24 @@ class _CrudViewState extends State<CrudView> {
   }
 
   Widget _buildTitle(BuildContext c, Map<String, dynamic> item) {
-    Widget w;
-    (onTap != null)
-        ? w = GestureDetector(
-            child: Text("${item[nameField]}"),
-            onTap: () => onTap(context, item),
-          )
-        : w = Text("${item[nameField]}");
-    return w;
+    return Text("${item[nameField]}");
   }
 }
 
 class CrudView extends StatefulWidget {
-  CrudView({
-    @required this.bloc,
-    this.nameField,
-    this.onUpdate,
-    this.onDelete,
-    this.trailingBuilder,
-    this.titleBuilder,
-    this.nameBuilder,
-    this.onTap,
-  });
+  CrudView(
+      {@required this.bloc,
+      this.nameField,
+      this.onUpdate,
+      this.onDelete,
+      this.trailingBuilder,
+      this.titleBuilder,
+      this.nameBuilder});
 
   final SelectBloc bloc;
   final String nameField;
   final ItemActionBuilder onDelete;
   final ItemActionBuilder onUpdate;
-  final ItemActionBuilder onTap;
   final ItemWidgetBuilder trailingBuilder;
   final ItemWidgetBuilder titleBuilder;
   final ItemStringBuilder nameBuilder;
@@ -193,8 +180,7 @@ class CrudView extends StatefulWidget {
       onDelete: onDelete,
       trailingBuilder: trailingBuilder,
       titleBuilder: titleBuilder,
-      nameBuilder: nameBuilder,
-      onTap: onTap);
+      nameBuilder: nameBuilder);
 }
 
 class BuildedItem extends StatelessWidget {
