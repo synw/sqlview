@@ -149,7 +149,7 @@ class _CrudViewState extends State<CrudView> {
     );
   }
 
-  Widget _buildTitle(BuildContext c, Map<String, dynamic> item) {
+  Widget _buildTitle(BuildContext _, Map<String, dynamic> item) {
     return Text("${item[nameField]}");
   }
 }
