@@ -1,5 +1,7 @@
 # Sqlview
 
+[![pub package](https://img.shields.io/pub/v/sqlview.svg)](https://pub.dartlang.org/packages/sqlview)
+
 Crud page widget for Sqlite and Flutter using [Sqlcool](https://github.com/synw/sqlcool)
 
 ## Example
