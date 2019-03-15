@@ -1,6 +1,6 @@
 name: sqlview
-description: Sql views widgets for Sqlcool. An almost ready to use page widget to handle Sqlite database crud operations
-author: synw <synwe@yahoo.com>
+description: Sql view widgets for Sqlcool. A ready to use page widget to handle Sqlite database crud operations
+author: synw <ansterj@gmail.com>
 homepage: https://github.com/synw/sqlview
 
 # The following defines the version and build number for your application.
