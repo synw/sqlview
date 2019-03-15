@@ -5,18 +5,32 @@ import 'conf.dart';
 import 'dialogs.dart';
 
 class _PageCrudExampleState extends State<PageCrudExample> {
-  final SelectBloc bloc =
-      SelectBloc(database: db, table: "item", reactive: true, verbose: true);
+  SelectBloc bloc;
+
+  bool _dbIsReady = false;
+
+  @override
+  void initState() {
+    db.onReady.then((_) {
+      print("The database is ready");
+      bloc = SelectBloc(
+          database: db, table: "item", reactive: true, verbose: true);
+      setState(() => _dbIsReady = true);
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CrudView(
-        bloc: bloc,
-        onUpdate: updateDialog,
-      ),
+      body: !_dbIsReady
+          ? const CircularProgressIndicator()
+          : CrudView(
+              bloc: bloc,
+              onUpdate: updateDialog,
+            ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () => addDialog(context),
       ),
     );
@@ -43,10 +57,10 @@ initDb() async {
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
   )""";
-  String q1 = 'INSERT INTO items(name) VALUES("row 1")';
-  String q2 = 'INSERT INTO items(name) VALUES("row 2")';
-  String q3 = 'INSERT INTO items(name) VALUES("row 3")';
-  String dbpath = "items.sqlite";
+  String q1 = 'INSERT INTO item(name) VALUES("row 1")';
+  String q2 = 'INSERT INTO item(name) VALUES("row 2")';
+  String q3 = 'INSERT INTO item(name) VALUES("row 3")';
+  String dbpath = "item.sqlite";
   await db
       .init(path: dbpath, queries: [q, q1, q2, q3], verbose: true)
       .catchError((e) {
@@ -55,7 +69,6 @@ initDb() async {
 }
 
 void main() {
-  initDb().then((_) {
-    runApp(MyApp());
-  });
+  initDb();
+  runApp(MyApp());
 }

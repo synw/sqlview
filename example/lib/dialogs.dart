@@ -7,16 +7,16 @@ addDialog(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text("Add item"),
+        title: const Text("Add item"),
         actions: <Widget>[
           FlatButton(
-            child: Text("Cancel"),
+            child: const Text("Cancel"),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           FlatButton(
-            child: Text("Save"),
+            child: const Text("Save"),
             onPressed: () async {
               Navigator.of(context).pop();
               db.insert(
@@ -42,27 +42,27 @@ updateDialog(BuildContext context, Map<String, dynamic> item) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text("Update category"),
+        title: const Text("Update category"),
         content: TextField(
           controller: controller,
           autofocus: true,
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text("Cancel"),
+            child: const Text("Cancel"),
             onPressed: () {
               Navigator.of(context).pop(true);
             },
           ),
           FlatButton(
-            child: Text("Save"),
+            child: const Text("Save"),
             onPressed: () {
               Navigator.of(context).pop(true);
               db
                   .update(
                       table: "item",
                       row: {"name": controller.text},
-                      where: 'id=item["id"]')
+                      where: 'id=${item["id"]}')
                   .catchError((e) {
                 throw (e);
               });
