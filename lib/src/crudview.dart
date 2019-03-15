@@ -3,9 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
 
+/// A builder for actions : update or delete
 typedef void ItemActionBuilder(BuildContext context, Map<String, dynamic> item);
+
+/// A widget builder
 typedef Widget ItemWidgetBuilder(
     BuildContext context, Map<String, dynamic> item);
+
+/// A strings builder
 typedef String ItemStringBuilder(
     BuildContext context, Map<String, dynamic> item);
 
@@ -22,7 +27,7 @@ class _CrudViewState extends State<CrudView> {
     nameField = nameField ?? "name";
     trailingBuilder = trailingBuilder ??
         (_, __) {
-          return Text("");
+          return const Text("");
         };
     onDelete = onDelete ?? _onDelete;
     onUpdate = onUpdate ?? (_, __) => null;
@@ -47,12 +52,13 @@ class _CrudViewState extends State<CrudView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Map>>(
+    return StreamBuilder<List<Map<String, dynamic>>>(
       stream: bloc.items,
-      builder: (BuildContext context, AsyncSnapshot<List<Map>> snapshot) {
+      builder: (BuildContext context,
+          AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
         if (snapshot.hasData) {
           _isInitialized = true;
-          if (snapshot.data.length == 0) {
+          if (snapshot.data.isEmpty) {
             return Center(
               child: Icon(
                 Icons.do_not_disturb_alt,
@@ -68,14 +74,14 @@ class _CrudViewState extends State<CrudView> {
                 return Slidable(
                   controller: _slidableController,
                   direction: Axis.horizontal,
-                  delegate: SlidableBehindDelegate(),
+                  delegate: const SlidableBehindDelegate(),
                   actionExtentRatio: 0.25,
                   child: ListTile(
-                    title: BuildedItem(
+                    title: _BuildedItem(
                       builder: titleBuilder,
                       item: item,
                     ),
-                    trailing: BuildedItem(
+                    trailing: _BuildedItem(
                       builder: trailingBuilder,
                       item: item,
                     ),
@@ -99,10 +105,10 @@ class _CrudViewState extends State<CrudView> {
         } else {
           if (_isInitialized) {
             return Center(
-              child: Text("No data"),
+              child: const Text("No data"),
             );
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: const CircularProgressIndicator());
           }
         }
       },
@@ -113,22 +119,22 @@ class _CrudViewState extends State<CrudView> {
     /// Default onDelete action
     String _name;
     (nameBuilder == null)
-        ? _name = _item[nameField]
+        ? _name = "${_item[nameField]}"
         : _name = nameBuilder(_context, _item);
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Delete $_name?"),
           actions: <Widget>[
             FlatButton(
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             RaisedButton(
-              child: Text("Delete"),
+              child: const Text("Delete"),
               color: Colors.red,
               textColor: Colors.white,
               onPressed: () {
@@ -137,7 +143,7 @@ class _CrudViewState extends State<CrudView> {
                         table: bloc.table,
                         where: 'id=${_item["id"]}',
                         verbose: bloc.verbose)
-                    .catchError((e) {
+                    .catchError((dynamic e) {
                   throw (e);
                 });
                 Navigator.of(context).pop(true);
@@ -154,7 +160,9 @@ class _CrudViewState extends State<CrudView> {
   }
 }
 
+/// An almost ready to use page for crud operations
 class CrudView extends StatefulWidget {
+  /// Basic constructor: needs a [SelectBloc]
   CrudView(
       {@required this.bloc,
       this.nameField,
@@ -164,12 +172,25 @@ class CrudView extends StatefulWidget {
       this.titleBuilder,
       this.nameBuilder});
 
+  /// The bloc defining the query
   final SelectBloc bloc;
+
+  /// The field used to represent the item
   final String nameField;
+
+  /// Delete item action
   final ItemActionBuilder onDelete;
+
+  /// Update item action
   final ItemActionBuilder onUpdate;
+
+  /// Builder for the list view trailing widget
   final ItemWidgetBuilder trailingBuilder;
+
+  /// Builder for the list view title
   final ItemWidgetBuilder titleBuilder;
+
+  /// Builder for the name: used as an alternative to [nameField]
   final ItemStringBuilder nameBuilder;
 
   @override
@@ -183,12 +204,12 @@ class CrudView extends StatefulWidget {
       nameBuilder: nameBuilder);
 }
 
-class BuildedItem extends StatelessWidget {
-  BuildedItem({@required this.builder, @required this.item})
+class _BuildedItem extends StatelessWidget {
+  _BuildedItem({@required this.builder, @required this.item})
       : assert(builder != null),
         assert(item != null);
 
-  final Function builder;
+  final ItemWidgetBuilder builder;
   final Map<String, dynamic> item;
 
   @override
