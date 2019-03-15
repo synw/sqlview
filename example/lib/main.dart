@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:sqlview/sqlview.dart';
-
-Db db = Db();
+import 'conf.dart';
+import 'dialogs.dart';
 
 class _PageCrudExampleState extends State<PageCrudExample> {
   final SelectBloc bloc =
-      SelectBloc(database: db, table: "items", reactive: true, verbose: true);
+      SelectBloc(database: db, table: "item", reactive: true, verbose: true);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CrudView(
         bloc: bloc,
+        onUpdate: updateDialog,
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => addDialog(context),
       ),
     );
   }
@@ -34,7 +39,7 @@ class MyApp extends StatelessWidget {
 }
 
 initDb() async {
-  String q = """CREATE TABLE items (
+  String q = """CREATE TABLE item (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL
   )""";
