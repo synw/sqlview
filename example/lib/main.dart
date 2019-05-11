@@ -1,74 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:sqlcool/sqlcool.dart';
-import 'package:sqlview/sqlview.dart';
 import 'conf.dart';
-import 'dialogs.dart';
+import 'home.dart';
+import 'crudview/crudview.dart';
+import 'listview/listview.dart';
+import 'package:dataview/dataview.dart';
 
-class _PageCrudExampleState extends State<PageCrudExample> {
-  SelectBloc bloc;
-
-  bool _dbIsReady = false;
-
-  @override
-  void initState() {
-    db.onReady.then((_) {
-      print("The database is ready");
-      bloc = SelectBloc(
-          database: db, table: "item", reactive: true, verbose: true);
-      setState(() => _dbIsReady = true);
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: !_dbIsReady
-          ? const CircularProgressIndicator()
-          : CrudView(
-              bloc: bloc,
-              onUpdate: updateDialog,
-            ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => addDialog(context),
-      ),
-    );
-  }
-}
-
-class PageCrudExample extends StatefulWidget {
-  @override
-  _PageCrudExampleState createState() => _PageCrudExampleState();
-}
+final routes = {
+  '/home': (BuildContext context) => HomePage(),
+  '/crudview': (BuildContext context) => CrudPage(),
+  '/listview': (BuildContext context) => ListViewPage(),
+  '/dataview': (BuildContext context) =>
+      DataviewPage("/", uploadTo: "http://192.168.1.2:8082/upload"),
+};
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dataview Demo',
-      home: PageCrudExample(),
+      title: 'Sql view Demo',
+      home: HomePage(),
+      routes: routes,
     );
   }
 }
 
-initDb() async {
-  String q = """CREATE TABLE item (
-  id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL
-  )""";
-  String q1 = 'INSERT INTO item(name) VALUES("row 1")';
-  String q2 = 'INSERT INTO item(name) VALUES("row 2")';
-  String q3 = 'INSERT INTO item(name) VALUES("row 3")';
-  String dbpath = "item.sqlite";
-  await db
-      .init(path: dbpath, queries: [q, q1, q2, q3], verbose: true)
-      .catchError((e) {
-    throw ("Error initializing the database: ${e.message}");
-  });
-}
-
 void main() {
-  initDb();
+  initConf();
   runApp(MyApp());
 }

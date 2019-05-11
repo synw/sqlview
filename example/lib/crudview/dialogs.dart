@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'conf.dart';
+import '../conf.dart';
 
 addDialog(BuildContext context) {
   final controller = TextEditingController();

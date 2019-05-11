@@ -2,17 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
-
-/// A builder for actions : update or delete
-typedef void ItemActionBuilder(BuildContext context, Map<String, dynamic> item);
-
-/// A widget builder
-typedef Widget ItemWidgetBuilder(
-    BuildContext context, Map<String, dynamic> item);
-
-/// A strings builder
-typedef String ItemStringBuilder(
-    BuildContext context, Map<String, dynamic> item);
+import 'datatypes.dart';
 
 class _CrudViewState extends State<CrudView> {
   _CrudViewState(
@@ -25,10 +15,7 @@ class _CrudViewState extends State<CrudView> {
       this.nameField})
       : assert(bloc != null) {
     nameField = nameField ?? "name";
-    trailingBuilder = trailingBuilder ??
-        (_, __) {
-          return const Text("");
-        };
+    trailingBuilder = trailingBuilder ?? (_, __) => const Text("");
     onDelete = onDelete ?? _onDelete;
     onUpdate = onUpdate ?? (_, __) => null;
     titleBuilder = titleBuilder ?? _buildTitle;
@@ -44,11 +31,6 @@ class _CrudViewState extends State<CrudView> {
 
   bool _isInitialized = false;
   SlidableController _slidableController;
-
-  @override
-  void setState(fn) {
-    super.setState(fn);
-  }
 
   @override
   Widget build(BuildContext context) {
