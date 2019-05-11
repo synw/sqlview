@@ -62,11 +62,11 @@ class _InfiniteListViewState extends State<InfiniteListView> {
         ? ListView.builder(
             itemBuilder: (context, index) {
               if (index < _data.length) {
-                print("$index < ${_data.length}");
+                //print("$index < ${_data.length}");
 
                 return itemsBuilder(context, _data[index]);
               } else {
-                print("FETCH $index > ${_data.length}");
+                //print("FETCH $index > ${_data.length}");
 
                 fetch().then((_) => setState(() {}));
                 return const Center(child: CircularProgressIndicator());
