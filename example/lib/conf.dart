@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:sqlcool/sqlcool.dart';
-import 'crudview/database.dart' as crud;
+import 'crudview/database_schema.dart' as crud;
 import 'listview/database_schema.dart' as listview;
 
 Db db = Db();
@@ -18,9 +18,12 @@ initConf() async {
 
 Future<void> initDb() async {
   // get the database schemas
-  List<String> q = crud.initQueries()..addAll(listview.initQueries());
+  List<DbTable> schema = crud.schema()..addAll(listview.schema());
+  List<String> q = crud.populateQueries();
   // initialize the database
-  await db.init(path: _dbpath, queries: q, verbose: true).catchError((e) {
+  await db
+      .init(path: _dbpath, schema: schema, queries: q, verbose: true)
+      .catchError((e) {
     throw ("Error initializing the database: ${e.message}");
   });
   // wait for the database to be ready

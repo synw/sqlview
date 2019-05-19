@@ -23,7 +23,8 @@ class _CrudPageState extends State<CrudPage> {
     return Scaffold(
       body: CrudView(
         bloc: bloc,
-        onUpdate: updateDialog,
+        nameField: "varchar",
+        //onUpdate: updateDialog,
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),

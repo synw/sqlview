@@ -19,11 +19,6 @@ class _HomePageState extends State<HomePage> {
           children: _ready
               ? <Widget>[
                   RaisedButton(
-                    child: const Text("Dataview"),
-                    onPressed: () =>
-                        Navigator.of(context).pushNamed("/dataview"),
-                  ),
-                  RaisedButton(
                     child: const Text("Crud view"),
                     onPressed: () =>
                         Navigator.of(context).pushNamed("/crudview"),

@@ -1,7 +1,6 @@
 import 'package:sqlcool/sqlcool.dart';
 
-List<String> initQueries() {
-  var qs = <String>[];
+List<DbTable> schema() {
   var company = DbTable("company")
     ..varchar("name", unique: true)
     ..varchar("symbol", unique: true)
@@ -10,7 +9,5 @@ List<String> initQueries() {
     ..integer("date")
     ..real("price")
     ..foreignKey("company");
-  qs.addAll(company.queries);
-  qs.addAll(price.queries);
-  return qs;
+  return [company, price];
 }

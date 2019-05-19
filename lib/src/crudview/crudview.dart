@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
-import 'datatypes.dart';
+import '../datatypes.dart';
+import 'forms.dart';
 
 class _CrudViewState extends State<CrudView> {
   _CrudViewState(
@@ -17,7 +18,7 @@ class _CrudViewState extends State<CrudView> {
     nameField = nameField ?? "name";
     trailingBuilder = trailingBuilder ?? (_, __) => const Text("");
     onDelete = onDelete ?? _onDelete;
-    onUpdate = onUpdate ?? (_, __) => null;
+    onUpdate = onUpdate ?? (c, i) => _onUpdate(c, i);
     titleBuilder = titleBuilder ?? _buildTitle;
   }
 
@@ -135,6 +136,22 @@ class _CrudViewState extends State<CrudView> {
         );
       },
     );
+  }
+
+  void _onUpdate(BuildContext context, Map<String, dynamic> item) {
+    Navigator.of(context)
+        .push(MaterialPageRoute<TableFormPage>(builder: (BuildContext context) {
+      String _name;
+      (nameBuilder == null)
+          ? _name = "${item[nameField]}"
+          : _name = nameBuilder(context, item);
+      return TableFormPage(
+        db: bloc.database,
+        formLabel: _name,
+        schema: bloc.database.schema.table(bloc.table),
+        updateWhere: "id=${item["id"]}",
+      );
+    }));
   }
 
   Widget _buildTitle(BuildContext _, Map<String, dynamic> item) {
