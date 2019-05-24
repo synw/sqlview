@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
 import '../datatypes.dart';
-import 'forms.dart';
+import 'form_page.dart';
 
 class _CrudViewState extends State<CrudView> {
   _CrudViewState(
@@ -100,10 +100,7 @@ class _CrudViewState extends State<CrudView> {
 
   void _onDelete(BuildContext _context, Map<String, dynamic> _item) {
     /// Default onDelete action
-    String _name;
-    (nameBuilder == null)
-        ? _name = "${_item[nameField]}"
-        : _name = nameBuilder(_context, _item);
+    String _name = _getName(_context, _item);
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -141,10 +138,7 @@ class _CrudViewState extends State<CrudView> {
   void _onUpdate(BuildContext context, Map<String, dynamic> item) {
     Navigator.of(context)
         .push(MaterialPageRoute<TableFormPage>(builder: (BuildContext context) {
-      String _name;
-      (nameBuilder == null)
-          ? _name = "${item[nameField]}"
-          : _name = nameBuilder(context, item);
+      String _name = _getName(context, item);
       return TableFormPage(
         db: bloc.database,
         formLabel: _name,
@@ -156,6 +150,14 @@ class _CrudViewState extends State<CrudView> {
 
   Widget _buildTitle(BuildContext _, Map<String, dynamic> item) {
     return Text("${item[nameField]}");
+  }
+
+  String _getName(BuildContext context, Map<String, dynamic> item) {
+    String n;
+    (nameBuilder == null)
+        ? n = "${item[nameField]}"
+        : n = nameBuilder(context, item);
+    return n;
   }
 }
 

@@ -3,8 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:card_settings/card_settings.dart';
 
-class _TableFormPageState extends State<TableFormPage> {
-  _TableFormPageState(
+class _TableFormState extends State<TableForm> {
+  _TableFormState(
       {@required this.db,
       @required this.schema,
       this.formLabel,
@@ -22,13 +22,18 @@ class _TableFormPageState extends State<TableFormPage> {
   Map<String, dynamic> _data = <String, dynamic>{};
   bool _ready = false;
   bool _defaultValues = false;
+  final Map<String, String> _values = <String, String>{};
 
   @override
   void initState() {
+    schema.columns.forEach((DatabaseColumn column) {
+      _values[column.name] = null;
+    });
     if (updateWhere != null)
       _getInitialData().then((d) => setState(() {
             _data = d;
             _defaultValues = true;
+            _data.forEach((String k, dynamic v) => _values[k] = "$v");
             _ready = true;
           }));
     else
@@ -48,15 +53,17 @@ class _TableFormPageState extends State<TableFormPage> {
     return data;
   }
 
-  Future<void> _updateData(Map<String, String> row) async {
+  void _saveForm(BuildContext context) {
     try {
-      await db.update(table: schema.name, where: updateWhere, row: row);
+      if (updateWhere != null)
+        db.update(table: schema.name, where: updateWhere, row: _values);
+      else
+        db.insert(table: schema.name, row: _values);
     } catch (e) {
-      throw ("Can not update data $e");
+      throw (e);
     }
+    Navigator.of(context).pop();
   }
-
-  void _saveForm() {}
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +80,8 @@ class _TableFormPageState extends State<TableFormPage> {
             children: <Widget>[
               CardSettingsHeader(label: formLabel),
               ...fields,
-              CardSettingsButton(label: "Save", onPressed: () => null)
+              CardSettingsButton(
+                  label: "Save", onPressed: () => _saveForm(context))
             ],
           )
         : const Center(child: CircularProgressIndicator());
@@ -87,40 +95,54 @@ class _TableFormPageState extends State<TableFormPage> {
       switch (column.type) {
         case DatabaseColumnType.boolean:
           if (!defaults) {
-            fields.add(CardSettingsSwitch(label: label));
+            fields.add(CardSettingsSwitch(
+                label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else
             fields.add(CardSettingsSwitch(
-                label: label, initialValue: (_data[column.name] == true)));
+                label: label,
+                onChanged: (v) => _values[column.name] = "$v",
+                initialValue: (_data[column.name].toString() == "true")));
           break;
         case DatabaseColumnType.integer:
           if (!defaults) {
-            fields.add(CardSettingsInt(label: label));
+            fields.add(CardSettingsInt(
+                label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else
             fields.add(CardSettingsInt(
                 label: label,
+                onChanged: (v) => _values[column.name] = "$v",
                 initialValue: int.tryParse(_data[column.name].toString())));
           break;
         case DatabaseColumnType.real:
           if (!defaults) {
-            fields.add(CardSettingsDouble(label: label));
+            fields.add(CardSettingsDouble(
+                label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else
             fields.add(CardSettingsDouble(
                 label: label,
+                onChanged: (v) => _values[column.name] = "$v",
                 initialValue: double.tryParse(_data[column.name].toString())));
           break;
         case DatabaseColumnType.varchar:
           if (!defaults) {
-            fields.add(CardSettingsText(label: label));
-          } else
             fields.add(CardSettingsText(
-                label: label, initialValue: _data[column.name].toString()));
-          break;
-        case DatabaseColumnType.text:
-          if (!defaults) {
-            fields.add(CardSettingsText(label: label, numberOfLines: 3));
+                label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else
             fields.add(CardSettingsText(
                 label: label,
+                onChanged: (v) => _values[column.name] = "$v",
+                initialValue: _data[column.name].toString()));
+          break;
+        case DatabaseColumnType.text:
+          if (!defaults) {
+            fields.add(CardSettingsText(
+                label: label,
+                onChanged: (v) => _values[column.name] = "$v",
+                numberOfLines: 3));
+          } else
+            fields.add(CardSettingsText(
+                label: label,
+                onChanged: (v) => _values[column.name] = "$v",
                 numberOfLines: 3,
                 initialValue: _data[column.name].toString()));
       }
@@ -136,8 +158,8 @@ class _TableFormPageState extends State<TableFormPage> {
   String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 }
 
-class TableFormPage extends StatefulWidget {
-  TableFormPage(
+class TableForm extends StatefulWidget {
+  TableForm(
       {@required this.db,
       @required this.schema,
       this.formLabel,
@@ -151,7 +173,7 @@ class TableFormPage extends StatefulWidget {
   final String updateWhere;
 
   @override
-  _TableFormPageState createState() => _TableFormPageState(
+  _TableFormState createState() => _TableFormState(
       db: db,
       schema: schema,
       formLabel: formLabel,
