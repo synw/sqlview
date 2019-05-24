@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
 import 'package:sqlview/sqlview.dart';
 import '../conf.dart';
-import 'dialogs.dart';
 
 class _CrudPageState extends State<CrudPage> {
   SelectBloc bloc;
@@ -28,7 +27,14 @@ class _CrudPageState extends State<CrudPage> {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => addDialog(context),
+        onPressed: () => Navigator.of(context)
+                .push(MaterialPageRoute(builder: (BuildContext context) {
+              return TableFormPage(
+                db: bloc.database,
+                formLabel: "Add a row",
+                schema: bloc.database.schema.table(bloc.table),
+              );
+            })),
       ),
     );
   }
