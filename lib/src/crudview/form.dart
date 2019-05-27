@@ -158,7 +158,11 @@ class _TableFormState extends State<TableForm> {
   String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
 }
 
+/// A form to insert or update rows
 class TableForm extends StatefulWidget {
+  /// The [schema] is the table schema. If [updateWhere] is not
+  /// provided this will render an add form, otherwise this will
+  /// render an update form
   TableForm(
       {@required this.db,
       @required this.schema,
@@ -166,10 +170,19 @@ class TableForm extends StatefulWidget {
       this.autoLabel = true,
       this.updateWhere});
 
+  /// The Sqlcool dataabse
   final Db db;
+
+  /// The table schema
   final DbTable schema;
+
+  /// The label to display for the form
   final String formLabel;
+
+  /// Format fields labels from field name
   final bool autoLabel;
+
+  /// The sql where condition to grab the row to update
   final String updateWhere;
 
   @override
