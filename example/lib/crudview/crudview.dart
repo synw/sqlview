@@ -8,34 +8,17 @@ class _CrudPageState extends State<CrudPage> {
 
   @override
   void initState() {
-    bloc = SelectBloc(
-      database: db,
-      table: "item",
-      reactive: true,
-      verbose: true,
-    );
+    bloc =
+        SelectBloc(database: db, table: "item", reactive: true, verbose: true);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CrudView(
-        bloc: bloc,
-        nameField: "varchar",
-        //onUpdate: updateDialog,
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => Navigator.of(context)
-                .push(MaterialPageRoute(builder: (BuildContext context) {
-              return TableFormPage(
-                db: bloc.database,
-                formLabel: "Add a row",
-                schema: bloc.database.schema.table(bloc.table),
-              );
-            })),
-      ),
+      body: CrudView(bloc: bloc, nameField: "varchar"),
+      floatingActionButton:
+          CrudAddActionButton(db: db, schema: db.schema.table("item")),
     );
   }
 }
