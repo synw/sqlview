@@ -12,8 +12,10 @@ List<DbTable> schema() {
 
 List<String> populateQueries() {
   var qs = <String>[];
-  qs.add('INSERT INTO item(varchar) VALUES("row 1")');
-  qs.add('INSERT INTO item(varchar) VALUES("row 2")');
-  qs.add('INSERT INTO item(varchar) VALUES("row 3")');
+  int i = 0;
+  while (i < 13) {
+    qs.add('INSERT INTO item(varchar) VALUES("row $i")');
+    i++;
+  }
   return qs;
 }

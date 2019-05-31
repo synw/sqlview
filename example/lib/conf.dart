@@ -11,6 +11,7 @@ Completer _readyCompleter = Completer();
 Future<void> get onConfReady => _readyCompleter.future;
 
 initConf() async {
+  print("Initializing database");
   await initDb();
   _readyCompleter.complete();
   print("Configuration completed");
