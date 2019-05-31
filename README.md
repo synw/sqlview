@@ -2,84 +2,75 @@
 
 [![pub package](https://img.shields.io/pub/v/sqlview.svg)](https://pub.dartlang.org/packages/sqlview)
 
-Crud page widget for Sqlite and Flutter using [Sqlcool](https://github.com/synw/sqlcool)
+A collection of sql views for Sqlite and Flutter using [Sqlcool](https://github.com/synw/sqlcool). Available views:
 
-## Example
+- **Admin view**: full admin interface for add/edit/delete rows in a table
+- **Infinite list view** from a table
+
+## Crud admin view
+
+List of rows | Edit row
+------------ | --------
+![Crud admin 1](screenshots/1.png) | ![Crud admin 1](screenshots/2.png)
+
+To get the above use an Sqlcool database with a defined schema:
 
    ```dart
-import 'package:flutter/material.dart';
-import 'package:sqlcool/sqlcool.dart';
-import 'package:sqlview/sqlview.dart';
+   import 'package:sqlcool/sqlcool.dart';
 
-class _PageExpensesState extends State<PageExpenses> {
-  final SelectBloc bloc = SelectBloc(
-    table: "mytable",
-    columns: "id,name",
-    where: 'name LIKE "%joe%"',
-    orderBy: 'name ASC',
-    reactive: true,
-    verbose: true,
-  );
+   var table = DbTable("item")
+      ..boolean("boolean", defaultValue: false)
+      ..varchar("varchar")
+      ..integer('integer_number', defaultValue: 1)
+      ..real("double_number", defaultValue: 0)
+      ..text("text", defaultValue: "");
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        CrudView(
-            bloc: bloc,
-            onUpdate: update,
-            onDelete: delete,
-            trailingBuilder: (_context, _item) {
-              return IconButton(
-                icon: Icon(Icons.location_off),
-                onPressed: () => print("$_item"),
-              );
-            }),
-        Positioned(
-            right: 15.0,
-            bottom: 15.0,
-            child: FloatingActionButton(
-              heroTag: "actionBtn",
-              child: Icon(Icons.add),
-              onPressed: () => print("Add action"),
-            )),
-      ],
-    );
-  }
-}
+   var db = Db();
+   db.init("db.sqlite", schema = [table]);
+   ```
 
-update(BuildContext context, Map<String, dynamic> item) {
-  // item is the json record
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Update"),
-          // ...
-          // Update using the Sqlcool database
-          // Map<String, String> row = {"name": "value"};
-          // db.update(table: "mytable", row: row, where: 'id=${item["id"]}');
-        );
+Then use it in a widget:
+
+   ```dart
+   import 'package:flutter/material.dart';
+   import 'package:sqlcool/sqlcool.dart';
+   import 'package:sqlview/sqlview.dart';
+
+   class _CrudPageState extends State<CrudPage> {
+      SelectBloc bloc;
+
+   @override
+   void initState() {
+      bloc = SelectBloc(database: db, table: "item");
+      super.initState();
+   }
+
+   @override
+   Widget build(BuildContext context) {
+      return Scaffold(
+         body: CrudView(bloc: bloc, nameField: "varchar"),
+         floatingActionButton:
+            CrudAddActionButton(db: db, schema: db.schema.table("item")),
+         );
+      }
+   }
+
+   class CrudPage extends StatefulWidget {
+      @override
+      _CrudPageState createState() => _CrudPageState();
+   }
+   ```
+
+## Infinite list view
+
+   ```dart
+   InfiniteListView(
+      db: db,
+      table: "product",
+      limit: 15,
+      orderBy: "name",
+      itemsBuilder: (context, item) {
+         return ListTile(
+            title: Text(item['name']), trailing: Text(item["price"]));
       });
-}
-
-delete(BuildContext context, Map<String, dynamic> item) {
-  // item is the json record
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Delete"),
-          // ...
-          // delete using the Sqlcool database
-          // db.delete(table: "mytable", where: 'id=${item["id"]}');
-        );
-      });
-}
-
-class PageExpenses extends StatefulWidget {
-  @override
-  _PageExpensesState createState() => _PageExpensesState();
-}
-
    ```
