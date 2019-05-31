@@ -87,11 +87,11 @@ class _CrudViewState extends State<CrudView> {
               });
         } else {
           if (_isInitialized) {
-            return Center(
-              child: const Text("No data"),
+            return const Center(
+              child: Text("No data"),
             );
           } else {
-            return Center(child: const CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
         }
       },
