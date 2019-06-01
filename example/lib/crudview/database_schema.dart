@@ -6,7 +6,7 @@ List<DbTable> schema() {
     ..varchar("varchar")
     ..integer('integer_number', defaultValue: 1)
     ..real("double_number", defaultValue: 0)
-    ..text("text", defaultValue: "");
+    ..text("text", nullable: true);
   return [table];
 }
 
