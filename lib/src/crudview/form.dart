@@ -127,11 +127,14 @@ class _TableFormState extends State<TableForm> {
           if (!defaults) {
             fields.add(CardSettingsText(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
-          } else
+          } else {
+            String val = _data[column.name].toString();
+            if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
-                initialValue: _data[column.name].toString()));
+                initialValue: val));
+          }
           break;
         case DatabaseColumnType.text:
           if (!defaults) {
@@ -139,12 +142,15 @@ class _TableFormState extends State<TableForm> {
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 numberOfLines: 3));
-          } else
+          } else {
+            String val = _data[column.name].toString();
+            if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 numberOfLines: 3,
-                initialValue: _data[column.name].toString()));
+                initialValue: val));
+          }
       }
     });
     return fields;
