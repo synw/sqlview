@@ -74,3 +74,7 @@ Then use it in a widget:
             title: Text(item['name']), trailing: Text(item["price"]));
       });
    ```
+
+## Todo
+
+- [ ] Add validators for forms in `CrudView`
