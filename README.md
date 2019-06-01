@@ -67,7 +67,6 @@ Then use it in a widget:
    InfiniteListView(
       db: db,
       table: "product",
-      limit: 15,
       orderBy: "name",
       itemsBuilder: (context, item) {
          return ListTile(
@@ -77,4 +76,4 @@ Then use it in a widget:
 
 ## Todo
 
-- [ ] Add validators for forms in `CrudView`
+- [ ] Check table constraints and add validators for forms in `CrudView`
