@@ -57,7 +57,7 @@ class _CrudViewState extends State<CrudView> {
                 return Slidable(
                   controller: _slidableController,
                   direction: Axis.horizontal,
-                  delegate: const SlidableBehindDelegate(),
+                  actionPane: const SlidableDrawerActionPane(),
                   actionExtentRatio: 0.25,
                   child: ListTile(
                     title: _BuildedItem(
