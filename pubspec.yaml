@@ -17,8 +17,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sqlcool: ^2.8.1
-  flutter_slidable: ^0.4.9
+  sqlcool: ^2.8.2
+  flutter_slidable: ^0.5.3
   card_settings: ^1.4.1
 
   # The following adds the Cupertino Icons font to your application.
