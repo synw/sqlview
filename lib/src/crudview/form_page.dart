@@ -12,7 +12,8 @@ class TableFormPage extends StatelessWidget {
       @required this.schema,
       this.formLabel,
       this.autoLabel = true,
-      this.updateWhere});
+      this.updateWhere,
+      this.defaultValues});
 
   /// The Sqlcool dataabse
   final Db db;
@@ -29,6 +30,9 @@ class TableFormPage extends StatelessWidget {
   /// The sql where condition to grab the row to update
   final String updateWhere;
 
+  /// Pass default values for add form
+  final Map<String, dynamic> defaultValues;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,6 +42,7 @@ class TableFormPage extends StatelessWidget {
         autoLabel: autoLabel,
         formLabel: formLabel,
         updateWhere: updateWhere,
+        defaultValues: defaultValues,
       ),
     );
   }

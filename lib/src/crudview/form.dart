@@ -9,7 +9,8 @@ class _TableFormState extends State<TableForm> {
       @required this.schema,
       this.formLabel,
       this.autoLabel = true,
-      this.updateWhere}) {
+      this.updateWhere,
+      this.defaultValues = const <String, dynamic>{}}) {
     formLabel ??= _autoLabel(schema.name);
   }
 
@@ -18,11 +19,11 @@ class _TableFormState extends State<TableForm> {
   final bool autoLabel;
   String formLabel;
   String updateWhere;
+  final Map<String, dynamic> defaultValues;
 
-  Map<String, dynamic> _data = <String, dynamic>{};
   bool _ready = false;
   bool _defaultValues = false;
-  final Map<String, String> _values = <String, String>{};
+  var _values = <String, dynamic>{};
 
   @override
   void initState() {
@@ -31,13 +32,18 @@ class _TableFormState extends State<TableForm> {
     });
     if (updateWhere != null)
       _getInitialData().then((d) => setState(() {
-            _data = d;
+            //_data = d;
             _defaultValues = true;
-            _data.forEach((String k, dynamic v) => _values[k] = "$v");
+            d.forEach((String k, dynamic v) => _values[k] = "$v");
             _ready = true;
           }));
-    else
+    else {
+      if (defaultValues.isNotEmpty) {
+        _defaultValues = true;
+        _values = defaultValues;
+      }
       _ready = true;
+    }
     super.initState();
   }
 
@@ -54,11 +60,18 @@ class _TableFormState extends State<TableForm> {
   }
 
   void _saveForm(BuildContext context) {
+    // check for nulls
+    var vals = <String, String>{};
+    _values.forEach((String k, dynamic v) {
+      if ((v) == "null") v = "NULL";
+      vals[k] = "$v";
+    });
+    // save
     try {
       if (updateWhere != null)
-        db.update(table: schema.name, where: updateWhere, row: _values);
+        db.update(table: schema.name, where: updateWhere, row: vals);
       else
-        db.insert(table: schema.name, row: _values);
+        db.insert(table: schema.name, row: vals);
     } catch (e) {
       throw (e);
     }
@@ -101,7 +114,7 @@ class _TableFormState extends State<TableForm> {
             fields.add(CardSettingsSwitch(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
-                initialValue: (_data[column.name].toString() == "true")));
+                initialValue: (_values[column.name].toString() == "true")));
           break;
         case DatabaseColumnType.integer:
           if (!defaults) {
@@ -111,7 +124,7 @@ class _TableFormState extends State<TableForm> {
             fields.add(CardSettingsInt(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
-                initialValue: int.tryParse(_data[column.name].toString())));
+                initialValue: int.tryParse(_values[column.name].toString())));
           break;
         case DatabaseColumnType.real:
           if (!defaults) {
@@ -121,14 +134,15 @@ class _TableFormState extends State<TableForm> {
             fields.add(CardSettingsDouble(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
-                initialValue: double.tryParse(_data[column.name].toString())));
+                initialValue:
+                    double.tryParse(_values[column.name].toString())));
           break;
         case DatabaseColumnType.varchar:
           if (!defaults) {
             fields.add(CardSettingsText(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else {
-            String val = _data[column.name].toString();
+            String val = _values[column.name].toString();
             if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
@@ -143,7 +157,7 @@ class _TableFormState extends State<TableForm> {
                 onChanged: (v) => _values[column.name] = "$v",
                 numberOfLines: 3));
           } else {
-            String val = _data[column.name].toString();
+            String val = _values[column.name].toString();
             if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
@@ -174,7 +188,8 @@ class TableForm extends StatefulWidget {
       @required this.schema,
       this.formLabel,
       this.autoLabel = true,
-      this.updateWhere});
+      this.updateWhere,
+      this.defaultValues});
 
   /// The Sqlcool dataabse
   final Db db;
@@ -191,11 +206,15 @@ class TableForm extends StatefulWidget {
   /// The sql where condition to grab the row to update
   final String updateWhere;
 
+  /// Pass default values for add form
+  final Map<String, dynamic> defaultValues;
+
   @override
   _TableFormState createState() => _TableFormState(
       db: db,
       schema: schema,
       formLabel: formLabel,
       autoLabel: autoLabel,
-      updateWhere: updateWhere);
+      updateWhere: updateWhere,
+      defaultValues: defaultValues);
 }
