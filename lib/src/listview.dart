@@ -1,3 +1,4 @@
+import 'package:rxdart/rxdart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sqlcool/sqlcool.dart';
@@ -13,6 +14,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
       this.offset = 0,
       this.limit = 30,
       @required this.itemsBuilder,
+      this.search = false,
       this.verbose = false})
       : _currentOffset = offset;
 
@@ -25,10 +27,13 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   final int limit;
   final ItemWidgetBuilder itemsBuilder;
   final bool verbose;
+  final bool search;
 
   int _currentOffset;
-  final _data = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _data = <Map<String, dynamic>>[];
   bool _ready = false;
+  final _controller = TextEditingController();
+  final _subject = PublishSubject<String>();
 
   Future<void> fetch({bool initial = false}) async {
     try {
@@ -53,28 +58,67 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   @override
   void initState() {
     fetch(initial: true).then((_) => setState(() => _ready = true));
+    _subject.stream
+        .debounceTime(Duration(milliseconds: 500))
+        .listen((dynamic text) {
+      db
+          .select(
+              table: table,
+              where: where,
+              orderBy: orderBy,
+              columns: columns,
+              verbose: verbose)
+          .then((res) {
+        setState(() => _data = res);
+      });
+    });
     super.initState();
   }
 
   @override
+  void dispose() {
+    _subject.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return _ready
-        ? ListView.builder(
-            itemBuilder: (context, index) {
-              if (index < _data.length) {
-                //print("$index < ${_data.length}");
+    if (_data.isEmpty) return const Center(child: Text("No data"));
+    Widget w;
+    _ready
+        ? w = Column(children: <Widget>[
+            if (search)
+              Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                          child: TextField(
+                        controller: _controller,
+                        onChanged: (text) => _subject.add(text),
+                      )),
+                      Icon(Icons.search)
+                    ],
+                  )),
+            Expanded(
+                child: ListView.builder(
+              itemBuilder: (context, index) {
+                if (index < _data.length) {
+                  //print("BUILD ITEM $index < ${_data.length}");
 
-                return itemsBuilder(context, _data[index]);
-              } else {
-                //print("FETCH $index > ${_data.length}");
-
-                fetch().then((_) => setState(() {}));
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-            itemCount: _data.length + 1,
-          )
-        : const Center(child: CircularProgressIndicator());
+                  return itemsBuilder(context, _data[index]);
+                } else {
+                  if (index == _data.length) return const Text("");
+                  //print("FETCH $index > ${_data.length}");
+                  fetch().then((_) => setState(() {}));
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+              itemCount: _data.length + 1,
+            ))
+          ])
+        : w = const Center(child: CircularProgressIndicator());
+    return w;
   }
 }
 

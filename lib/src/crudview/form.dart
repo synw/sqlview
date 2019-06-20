@@ -10,7 +10,7 @@ class _TableFormState extends State<TableForm> {
       this.formLabel,
       this.autoLabel = true,
       this.updateWhere,
-      this.defaultValues = const <String, dynamic>{}}) {
+      this.defaultValues}) {
     formLabel ??= _autoLabel(schema.name);
   }
 
@@ -28,7 +28,8 @@ class _TableFormState extends State<TableForm> {
   @override
   void initState() {
     schema.columns.forEach((DatabaseColumn column) {
-      _values[column.name] = null;
+      if (column.type != DatabaseColumnType.timestamp &&
+          column.type != DatabaseColumnType.blob) _values[column.name] = null;
     });
     if (updateWhere != null)
       _getInitialData().then((d) => setState(() {
@@ -38,7 +39,7 @@ class _TableFormState extends State<TableForm> {
             _ready = true;
           }));
     else {
-      if (defaultValues.isNotEmpty) {
+      if (defaultValues != null) {
         _defaultValues = true;
         _values = defaultValues;
       }
@@ -60,6 +61,7 @@ class _TableFormState extends State<TableForm> {
   }
 
   void _saveForm(BuildContext context) {
+    print("SAVE FORM $_values");
     // check for nulls
     var vals = <String, String>{};
     _values.forEach((String k, dynamic v) {
@@ -165,6 +167,11 @@ class _TableFormState extends State<TableForm> {
                 numberOfLines: 3,
                 initialValue: val));
           }
+          break;
+        case DatabaseColumnType.timestamp:
+          break;
+        case DatabaseColumnType.blob:
+          break;
       }
     });
     return fields;
