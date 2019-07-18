@@ -14,9 +14,15 @@ class _InfiniteListViewState extends State<InfiniteListView> {
       this.offset = 0,
       this.limit = 30,
       @required this.itemsBuilder,
-      this.search = false,
+      //this.searchColumn,
+      //this.searchStartsWith = false,
       this.verbose = false})
-      : _currentOffset = offset;
+      : _currentOffset = offset {
+    /*if (searchColumn == null)
+      _search = false;
+    else
+      _search = true;*/
+  }
 
   final Db db;
   final String table;
@@ -27,13 +33,16 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   final int limit;
   final ItemWidgetBuilder itemsBuilder;
   final bool verbose;
-  final bool search;
+  //final String searchColumn;
+  //final bool searchStartsWith;
 
   int _currentOffset;
-  List<Map<String, dynamic>> _data = <Map<String, dynamic>>[];
+  //bool _search;
+  var _data = <Map<String, dynamic>>[];
   bool _ready = false;
-  final _controller = TextEditingController();
+  //final _controller = TextEditingController();
   final _subject = PublishSubject<String>();
+  bool _foundData;
 
   Future<void> fetch({bool initial = false}) async {
     try {
@@ -48,30 +57,49 @@ class _InfiniteListViewState extends State<InfiniteListView> {
           offset: _currentOffset,
           limit: limit,
           verbose: verbose);
-      _data.addAll(res);
+      //res ??= <Map<String, dynamic>>[];
+      if (res.isNotEmpty) {
+        _foundData = true;
+      } else {
+        _foundData = false;
+      }
+      _data = <Map<String, dynamic>>[]..addAll(_data)..addAll(res);
+      //_data.addAll(res);
       //print("DATA $_data");
     } catch (e) {
-      throw (e);
+      rethrow;
     }
   }
 
   @override
   void initState() {
     fetch(initial: true).then((_) => setState(() => _ready = true));
-    _subject.stream
-        .debounceTime(Duration(milliseconds: 500))
-        .listen((dynamic text) {
-      db
-          .select(
-              table: table,
-              where: where,
-              orderBy: orderBy,
-              columns: columns,
-              verbose: verbose)
-          .then((res) {
-        setState(() => _data = res);
-      });
-    });
+    /*if (_search)
+      _subject.stream
+          .debounceTime(Duration(milliseconds: 500))
+          .listen((dynamic text) {
+        String w = where;
+        String textSearch = "%$text%";
+        if (searchStartsWith) {
+          textSearch = "$text%";
+        }
+        if (text != "") if (where != null) {
+          w = '$where AND $searchColumn LIKE "$textSearch"';
+        } else
+          w = '$searchColumn LIKE "$textSearch"';
+        db
+            .select(
+                table: table,
+                where: w,
+                limit: limit,
+                orderBy: orderBy,
+                columns: columns,
+                verbose: verbose)
+            .then((List<Map<String, dynamic>> res) {
+          res ??= <Map<String, dynamic>>[];
+          setState(() => _data = res);
+        });
+      });*/
     super.initState();
   }
 
@@ -83,11 +111,11 @@ class _InfiniteListViewState extends State<InfiniteListView> {
 
   @override
   Widget build(BuildContext context) {
-    if (_data.isEmpty) return const Center(child: Text("No data"));
+    if (_ready && _data.isEmpty) return const Center(child: Text("No data"));
     Widget w;
     _ready
         ? w = Column(children: <Widget>[
-            if (search)
+            /*if (_search)
               Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
@@ -99,17 +127,19 @@ class _InfiniteListViewState extends State<InfiniteListView> {
                       )),
                       Icon(Icons.search)
                     ],
-                  )),
+                  )),*/
             Expanded(
                 child: ListView.builder(
               itemBuilder: (context, index) {
                 if (index < _data.length) {
                   //print("BUILD ITEM $index < ${_data.length}");
-
                   return itemsBuilder(context, _data[index]);
                 } else {
-                  if (index == _data.length) return const Text("");
-                  //print("FETCH $index > ${_data.length}");
+                  if (!_foundData) {
+                    //print("NO DATA");
+                    return const Text("");
+                  }
+                  // print("FETCH $index > ${_data.length}");
                   fetch().then((_) => setState(() {}));
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -133,6 +163,7 @@ class InfiniteListView extends StatefulWidget {
       this.orderBy,
       this.offset = 0,
       this.limit = 30,
+      //this.searchColumn,
       @required this.itemsBuilder,
       this.verbose = false})
       : assert(db != null),
@@ -159,6 +190,9 @@ class InfiniteListView extends StatefulWidget {
   /// The sql limit value
   final int limit;
 
+  /// The fueld to Use to search. Adds a search widget
+  //final String searchColumn;
+
   /// The function to build the content widgets
   final ItemWidgetBuilder itemsBuilder;
 
@@ -174,5 +208,7 @@ class InfiniteListView extends StatefulWidget {
       orderBy: orderBy,
       offset: offset,
       limit: limit,
-      itemsBuilder: itemsBuilder);
+      //searchColumn: searchColumn,
+      itemsBuilder: itemsBuilder,
+      verbose: verbose);
 }

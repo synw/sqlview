@@ -31,14 +31,14 @@ class _TableFormState extends State<TableForm> {
       if (column.type != DatabaseColumnType.timestamp &&
           column.type != DatabaseColumnType.blob) _values[column.name] = null;
     });
-    if (updateWhere != null)
+    if (updateWhere != null) {
       _getInitialData().then((d) => setState(() {
             //_data = d;
             _defaultValues = true;
             d.forEach((String k, dynamic v) => _values[k] = "$v");
             _ready = true;
           }));
-    else {
+    } else {
       if (defaultValues != null) {
         _defaultValues = true;
         _values = defaultValues;
@@ -55,7 +55,7 @@ class _TableFormState extends State<TableForm> {
           await db.select(table: schema.name, where: updateWhere);
       data = res[0];
     } catch (e) {
-      throw (e);
+      rethrow;
     }
     return data;
   }
@@ -70,12 +70,13 @@ class _TableFormState extends State<TableForm> {
     });
     // save
     try {
-      if (updateWhere != null)
+      if (updateWhere != null) {
         db.update(table: schema.name, where: updateWhere, row: vals);
-      else
+      } else {
         db.insert(table: schema.name, row: vals);
+      }
     } catch (e) {
-      throw (e);
+      rethrow;
     }
     Navigator.of(context).pop();
   }
@@ -112,32 +113,35 @@ class _TableFormState extends State<TableForm> {
           if (!defaults) {
             fields.add(CardSettingsSwitch(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
-          } else
+          } else {
             fields.add(CardSettingsSwitch(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 initialValue: (_values[column.name].toString() == "true")));
+          }
           break;
         case DatabaseColumnType.integer:
           if (!defaults) {
             fields.add(CardSettingsInt(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
-          } else
+          } else {
             fields.add(CardSettingsInt(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 initialValue: int.tryParse(_values[column.name].toString())));
+          }
           break;
         case DatabaseColumnType.real:
           if (!defaults) {
             fields.add(CardSettingsDouble(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
-          } else
+          } else {
             fields.add(CardSettingsDouble(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 initialValue:
                     double.tryParse(_values[column.name].toString())));
+          }
           break;
         case DatabaseColumnType.varchar:
           if (!defaults) {
