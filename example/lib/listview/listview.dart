@@ -22,7 +22,8 @@ class _ListViewPageState extends State<ListViewPage> {
           ? InfiniteListView(
               db: db,
               table: "company",
-              limit: 15,
+              limit: 35,
+              //searchColumn: "name",
               orderBy: "name",
               itemsBuilder: (context, item) {
                 return ListTile(
@@ -31,6 +32,7 @@ class _ListViewPageState extends State<ListViewPage> {
               verbose: true)
           : Center(
               child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10.0),
