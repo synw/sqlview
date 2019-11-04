@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:sqlcool/sqlcool.dart';
 import 'package:card_settings/card_settings.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:sqlcool/sqlcool.dart';
 
 class _TableFormState extends State<TableForm> {
   _TableFormState(
@@ -27,9 +27,9 @@ class _TableFormState extends State<TableForm> {
 
   @override
   void initState() {
-    schema.columns.forEach((DatabaseColumn column) {
-      if (column.type != DatabaseColumnType.timestamp &&
-          column.type != DatabaseColumnType.blob) _values[column.name] = null;
+    schema.columns.forEach((DbColumn column) {
+      if (column.type != DbColumnType.timestamp &&
+          column.type != DbColumnType.blob) _values[column.name] = null;
     });
     if (updateWhere != null) {
       _getInitialData().then((d) => setState(() {
@@ -51,8 +51,7 @@ class _TableFormState extends State<TableForm> {
   Future<Map<String, dynamic>> _getInitialData() async {
     Map<String, dynamic> data;
     try {
-      List<Map<String, dynamic>> res =
-          await db.select(table: schema.name, where: updateWhere);
+      final res = await db.select(table: schema.name, where: updateWhere);
       data = res[0];
     } catch (e) {
       rethrow;
@@ -63,9 +62,9 @@ class _TableFormState extends State<TableForm> {
   void _saveForm(BuildContext context) {
     print("SAVE FORM $_values");
     // check for nulls
-    var vals = <String, String>{};
+    final vals = <String, String>{};
     _values.forEach((String k, dynamic v) {
-      if ((v) == "null") v = "NULL";
+      if (v == "null") v = "NULL";
       vals[k] = "$v";
     });
     // save
@@ -104,12 +103,12 @@ class _TableFormState extends State<TableForm> {
   }
 
   List<Widget> _buildFields({bool defaults = false}) {
-    var fields = <Widget>[];
-    schema.columns.forEach((DatabaseColumn column) {
-      String label = column.name;
+    final fields = <Widget>[];
+    schema.columns.forEach((DbColumn column) {
+      var label = column.name;
       if (autoLabel) label = _autoLabel(column.name);
       switch (column.type) {
-        case DatabaseColumnType.boolean:
+        case DbColumnType.boolean:
           if (!defaults) {
             fields.add(CardSettingsSwitch(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
@@ -117,10 +116,10 @@ class _TableFormState extends State<TableForm> {
             fields.add(CardSettingsSwitch(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
-                initialValue: (_values[column.name].toString() == "true")));
+                initialValue: _values[column.name].toString() == "true"));
           }
           break;
-        case DatabaseColumnType.integer:
+        case DbColumnType.integer:
           if (!defaults) {
             fields.add(CardSettingsInt(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
@@ -131,7 +130,7 @@ class _TableFormState extends State<TableForm> {
                 initialValue: int.tryParse(_values[column.name].toString())));
           }
           break;
-        case DatabaseColumnType.real:
+        case DbColumnType.real:
           if (!defaults) {
             fields.add(CardSettingsDouble(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
@@ -143,12 +142,12 @@ class _TableFormState extends State<TableForm> {
                     double.tryParse(_values[column.name].toString())));
           }
           break;
-        case DatabaseColumnType.varchar:
+        case DbColumnType.varchar:
           if (!defaults) {
             fields.add(CardSettingsText(
                 label: label, onChanged: (v) => _values[column.name] = "$v"));
           } else {
-            String val = _values[column.name].toString();
+            var val = _values[column.name].toString();
             if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
@@ -156,14 +155,14 @@ class _TableFormState extends State<TableForm> {
                 initialValue: val));
           }
           break;
-        case DatabaseColumnType.text:
+        case DbColumnType.text:
           if (!defaults) {
             fields.add(CardSettingsText(
                 label: label,
                 onChanged: (v) => _values[column.name] = "$v",
                 numberOfLines: 3));
           } else {
-            String val = _values[column.name].toString();
+            var val = _values[column.name].toString();
             if (val == "null") val = "";
             fields.add(CardSettingsText(
                 label: label,
@@ -172,9 +171,9 @@ class _TableFormState extends State<TableForm> {
                 initialValue: val));
           }
           break;
-        case DatabaseColumnType.timestamp:
+        case DbColumnType.timestamp:
           break;
-        case DatabaseColumnType.blob:
+        case DbColumnType.blob:
           break;
       }
     });
@@ -182,7 +181,7 @@ class _TableFormState extends State<TableForm> {
   }
 
   String _autoLabel(String value) {
-    String s = value.replaceAll("_", " ");
+    final s = value.replaceAll("_", " ");
     return _capitalize(s);
   }
 
@@ -194,7 +193,7 @@ class TableForm extends StatefulWidget {
   /// The [schema] is the table schema. If [updateWhere] is not
   /// provided this will render an add form, otherwise this will
   /// render an update form
-  TableForm(
+  const TableForm(
       {@required this.db,
       @required this.schema,
       this.formLabel,

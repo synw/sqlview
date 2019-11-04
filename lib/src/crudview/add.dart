@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
+
 import 'form_page.dart';
 
 /// Get the floating action button to add a record
@@ -24,7 +25,7 @@ FloatingActionButton addFloatingActionButton(
 /// A floating action button to add a row
 class CrudAddActionButton extends StatelessWidget {
   /// Default constructor: provide a [Db] and a [DbTable] schema
-  CrudAddActionButton({@required this.db, @required this.schema});
+  const CrudAddActionButton({@required this.db, @required this.schema});
 
   /// The database to use
   final Db db;

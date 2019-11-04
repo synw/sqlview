@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:sqlcool/sqlcool.dart';
+
 import '../datatypes.dart';
 import 'form_page.dart';
 
@@ -18,7 +19,7 @@ class _CrudViewState extends State<CrudView> {
     nameField = nameField ?? "name";
     trailingBuilder = trailingBuilder ?? (_, __) => const Text("");
     onDelete = onDelete ?? _onDelete;
-    onUpdate = onUpdate ?? (c, i) => _onUpdate(c, i);
+    onUpdate = onUpdate ?? _onUpdate;
     titleBuilder = titleBuilder ?? _buildTitle;
   }
 
@@ -53,7 +54,7 @@ class _CrudViewState extends State<CrudView> {
           return ListView.builder(
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
-                var item = snapshot.data[index];
+                final item = snapshot.data[index];
                 return Slidable(
                   controller: _slidableController,
                   direction: Axis.horizontal,
@@ -100,7 +101,7 @@ class _CrudViewState extends State<CrudView> {
 
   void _onDelete(BuildContext _context, Map<String, dynamic> _item) {
     /// Default onDelete action
-    String _name = _getName(_context, _item);
+    final _name = _getName(_context, _item);
     showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -118,14 +119,14 @@ class _CrudViewState extends State<CrudView> {
               color: Colors.red,
               textColor: Colors.white,
               onPressed: () {
-                bloc.database
-                    .delete(
-                        table: bloc.table,
-                        where: 'id=${_item["id"]}',
-                        verbose: bloc.verbose)
-                    .catchError((dynamic e) {
-                  throw (e);
-                });
+                try {
+                  bloc.database.delete(
+                      table: bloc.table,
+                      where: 'id=${_item["id"]}',
+                      verbose: bloc.verbose);
+                } catch (e) {
+                  rethrow;
+                }
                 Navigator.of(context).pop(true);
               },
             ),
@@ -138,7 +139,7 @@ class _CrudViewState extends State<CrudView> {
   void _onUpdate(BuildContext context, Map<String, dynamic> item) {
     Navigator.of(context)
         .push(MaterialPageRoute<TableFormPage>(builder: (BuildContext context) {
-      String _name = _getName(context, item);
+      final _name = _getName(context, item);
       return TableFormPage(
         db: bloc.database,
         formLabel: _name,
@@ -164,7 +165,7 @@ class _CrudViewState extends State<CrudView> {
 /// An almost ready to use page for crud operations
 class CrudView extends StatefulWidget {
   /// Basic constructor: needs a [SelectBloc]
-  CrudView(
+  const CrudView(
       {@required this.bloc,
       this.nameField,
       this.onUpdate,
@@ -206,7 +207,7 @@ class CrudView extends StatefulWidget {
 }
 
 class _BuildedItem extends StatelessWidget {
-  _BuildedItem({@required this.builder, @required this.item})
+  const _BuildedItem({@required this.builder, @required this.item})
       : assert(builder != null),
         assert(item != null);
 

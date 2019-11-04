@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqlcool/sqlcool.dart';
+
 import 'form.dart';
 
 /// A page to display a form
@@ -7,7 +8,7 @@ class TableFormPage extends StatelessWidget {
   /// The [schema] is the table schema. If [updateWhere] is not
   /// provided this will render an add form, otherwise this will
   /// render an update form
-  TableFormPage(
+  const TableFormPage(
       {@required this.db,
       @required this.schema,
       this.formLabel,

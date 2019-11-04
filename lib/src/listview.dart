@@ -1,19 +1,20 @@
-import 'package:rxdart/rxdart.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:sqlcool/sqlcool.dart';
+
 import 'datatypes.dart';
 
 class _InfiniteListViewState extends State<InfiniteListView> {
   _InfiniteListViewState(
       {@required this.db,
       @required this.table,
+      @required this.itemsBuilder,
       this.columns = "*",
       this.where,
       this.orderBy,
       this.offset = 0,
       this.limit = 30,
-      @required this.itemsBuilder,
       //this.searchColumn,
       //this.searchStartsWith = false,
       this.verbose = false})
@@ -49,7 +50,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
       if (!initial) _currentOffset = _currentOffset + limit;
       //print("FETCH offset $_currentOffset");
 
-      List<Map<String, dynamic>> res = await db.select(
+      final res = await db.select(
           table: table,
           where: where,
           orderBy: orderBy,
@@ -63,7 +64,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
       } else {
         _foundData = false;
       }
-      _data = <Map<String, dynamic>>[]..addAll(_data)..addAll(res);
+      _data = <Map<String, dynamic>>[..._data, ...res];
       //_data.addAll(res);
       //print("DATA $_data");
     } catch (e) {
@@ -155,16 +156,16 @@ class _InfiniteListViewState extends State<InfiniteListView> {
 /// The infinite list view widget
 class InfiniteListView extends StatefulWidget {
   /// Default constructor
-  InfiniteListView(
+  const InfiniteListView(
       {@required this.db,
       @required this.table,
+      @required this.itemsBuilder,
       this.columns = "*",
       this.where,
       this.orderBy,
       this.offset = 0,
       this.limit = 30,
       //this.searchColumn,
-      @required this.itemsBuilder,
       this.verbose = false})
       : assert(db != null),
         assert(table != null);
