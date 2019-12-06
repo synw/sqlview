@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Add the `DbViewer` widget
+- Use stronger analysis options
+- Update dependencies
+- Add support for default values param in forms 
+
 ## 0.3.0
 
 - Update dependencies
