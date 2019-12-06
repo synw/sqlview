@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
+//import 'package:rxdart/rxdart.dart';
 import 'package:sqlcool/sqlcool.dart';
 
 import 'datatypes.dart';
@@ -42,7 +42,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
   var _data = <Map<String, dynamic>>[];
   bool _ready = false;
   //final _controller = TextEditingController();
-  final _subject = PublishSubject<String>();
+  //final _subject = PublishSubject<String>();
   bool _foundData;
 
   Future<void> fetch({bool initial = false}) async {
@@ -106,7 +106,7 @@ class _InfiniteListViewState extends State<InfiniteListView> {
 
   @override
   void dispose() {
-    _subject.close();
+    //_subject.close();
     super.dispose();
   }
 
