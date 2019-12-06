@@ -11,8 +11,11 @@ class _DbViewerTableState extends State<DbViewerTable> {
   var _ready = false;
 
   Future<void> _getData() async {
-    _rows = await db.select(table: table.name, limit: 100).catchError(
-        (dynamic e) => throw ("Can not select from table ${table.name}"));
+    try {
+      _rows = await db.select(table: table.name, limit: 100);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
@@ -39,10 +42,15 @@ class _DbViewerTableState extends State<DbViewerTable> {
   }
 }
 
+/// A table
 class DbViewerTable extends StatefulWidget {
-  DbViewerTable({@required this.db, @required this.table});
+  /// Default constructor
+  const DbViewerTable({@required this.db, @required this.table});
 
+  /// The database
   final Db db;
+
+  /// The table
   final DbTable table;
 
   @override
